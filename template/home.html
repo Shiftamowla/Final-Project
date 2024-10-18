@@ -1,0 +1,109 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class="content">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <hr>
+
+    <div class="home-page" id="home">
+        <h2>Welcome to the Student Management System</h2>
+        <p>This system allows you to manage students, courses, schedules, and results efficiently.</p>
+        
+        <div class="home-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="{% url 'cource' %}">View Courses</a></li>
+                <li><a href="{% url 'table' %}">View Students</a></li>
+                <li><a href="#results">View Results</a></li>
+                <li><a href="#schedule">View Class Schedule</a></li>
+                <li><a href="{% url 'calender' %}">View Academic Calendar</a></li>
+            </ul>
+        </div>
+
+        <div class="home-section">
+            <h3>Announcements</h3>
+            <p>Stay tuned for upcoming events and important announcements.</p>
+            <ul>
+                <li><strong>Next Exam:</strong> December 10, 2024</li>
+                <li><strong>Registration Deadline:</strong> November 30, 2024</li>
+                <li><strong>Holiday Break:</strong> December 24, 2024 - January 1, 2025</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Search Students..." onkeyup="searchTable()">
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable">
+                <tr>
+                    <td>1</td>
+                    <td>John Doe</td>
+                    <td>Mathematics</td>
+                    <td>Active</td>
+                    <td>
+                        <button onclick="viewStudent(1)">View</button>
+                        <button onclick="editStudent(1)">Edit</button>
+                        <button onclick="deleteStudent(1)">Delete</button>
+                    </td>
+                </tr>
+                <!-- Additional student rows can be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Student Form -->
+    <div style="display: flex; justify-content: center;">
+        <form>
+            {% csrf_token %}
+            <table class="form-table">
+                <tr>
+                    <td><label for="name">Student Name:</label></td>
+                    <td><input type="text" id="name" name="name" required></td>
+                </tr>
+                <tr>
+                    <td><label for="course">Course:</label></td>
+                    <td><input type="text" id="course" name="course" required></td>
+                </tr>
+                <tr>
+                    <td><label for="status">Status:</label></td>
+                    <td>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Add Student">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Student Management System. All rights reserved.</p>
+    </footer>
+</div>
+
+{% endblock body %}

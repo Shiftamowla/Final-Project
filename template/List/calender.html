@@ -1,0 +1,36 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Term</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Holidays</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody id="studentTable">
+        <tr>
+            {% for i in calender %}
+
+            <tr>   
+                <td>{{i.year}}</td>
+                <td>{{i.term}}</td>
+                <td>{{i.start_date}}</td>
+                <td>{{i.end_date}}</td>
+                <td>{{i.holidays}}</td>
+            <td>
+                <button onclick="viewStudent(1)">View</button>
+                <button onclick="editStudent(1)">Edit</button>
+                <button onclick="deleteStudent(1)">Delete</button>
+            </td>
+            {% endfor %}
+
+        </tr>
+    </tbody>
+</table>
+{% endblock body %}

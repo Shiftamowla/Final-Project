@@ -1,0 +1,36 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<table>
+    <thead>
+        <tr>
+            <th>student</th>
+            <th>course</th>
+            <th>term</th>
+            <th>score</th>
+            <th>comments</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody id="studentTable">
+        <tr>
+            {% for student in students %}
+
+            <tr>   
+                <td>{{ student.student }}</td>
+                <td>{{ student.course }}</td>
+                <td>{{ student.term }}</td>
+                <td>{{ student.score }}</td>
+                <td>{{ student.comments }}</td>
+            <td>
+                <button onclick="viewStudent(1)">View</button>
+                <button onclick="editStudent(1)">Edit</button>
+                <button onclick="deleteStudent(1)">Delete</button>
+            </td>
+            {% endfor %}
+
+        </tr>
+    </tbody>
+</table>
+{% endblock body %}

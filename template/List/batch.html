@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<table>
+    <thead>
+        <tr>
+            <th>course</th>
+            <th>instructor</th>
+            <th>day_of_week</th>
+            <th>start_time</th>
+            <th>end_time</th>
+            <th>classroom</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody id="studentTable">
+        <tr>
+            {% for student in students %}
+
+            <tr>   
+                <td>{{ student.course }}</td>
+                <td>{{ student.instructor }}</td>
+                <td>{{ student.day_of_week }}</td>
+                <td>{{ student.start_time }}</td>
+                <td>{{ student.end_time }}</td>
+                <td>{{ student.classroom }}</td>
+            <td>
+                <button onclick="viewStudent(1)">View</button>
+                <button onclick="editStudent(1)">Edit</button>
+                <button onclick="deleteStudent(1)">Delete</button>
+            </td>
+            {% endfor %}
+
+        </tr>
+    </tbody>
+</table>
+{% endblock body %}

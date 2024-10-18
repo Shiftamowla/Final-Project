@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #2c3e50;
+            padding: 5px 20px;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: calc(100% - 50px); /* Adjust height for header */
+            top: 50px;
+            transition: transform 0.3s;
+            transform: translateX(-100%);
+            z-index: 100;
+            overflow-y: auto; /* Enable scrolling */
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .sidebar ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            transition: background 0.3s;
+            border-radius: 4px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #34495e;
+        }
+
+        .content {
+            flex: 1;
+            margin-left: 0;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+            transition: margin-left 0.3s;
+            padding-top: 20px;
+        }
+
+        /* Message Styles */
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        .message.success {
+            background-color: #03641e;
+        }
+
+        .message.warning {
+            background-color: #ffc107;
+        }
+
+        .message.error {
+            background-color: #dc3545;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Form Styles */
+        .form-table {
+            margin: 20px auto;
+            width: 100%;
+            max-width: 600px;
+            border-collapse: collapse;
+        }
+
+        .form-table td {
+            padding: 10px;
+        }
+
+        input[type="text"],
+        select {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 15px;
+            background-color: #2980b9;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1a5987;
+        }
+
+        /* Search bar style */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        /* Sidebar Dropdown Styles */
+        .sidebar .dropdown {
+            display: none;
+            background-color: #34495e;
+            border-radius: 4px;
+            padding: 0;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .sidebar .dropdown li {
+            margin: 0;
+        }
+
+        .sidebar .dropdown li a {
+            padding: 10px 20px;
+            white-space: nowrap;
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar .dropdown li a:hover {
+            background-color: #3c5b75;
+        }
+
+        /* Logout Dropdown Styles */
+        .logout-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #34495e;
+            border-radius: 4px;
+            padding: 0;
+            z-index: 1001;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+
+        .logout-dropdown li {
+            margin: 0;
+        }
+
+        .logout-dropdown li a {
+            padding: 10px 20px;
+            white-space: nowrap;
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .logout-dropdown li a:hover {
+            background-color: #3c5b75;
+        }
+
+        /* Three Dots Icon Style */
+        .three-dots {
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1px 0;
+            background-color: #2c3e50;
+            color: white;
+            position: relative;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .home-page {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .home-page h2 {
+            color: #2c3e50;
+        }
+
+        .home-section {
+            margin-top: 20px;
+        }
+
+        .home-section h3 {
+            color: #2980b9;
+        }
+
+        .home-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .home-section ul li {
+            margin: 5px 0;
+        }
+
+        .home-section ul li a {
+            text-decoration: none;
+            color: #2980b9;
+        }
+
+        .home-section ul li a:hover {
+            text-decoration: underline;
+        }
+        /* Form Styles */
+.form-table {
+    margin: 20px auto;
+    width: 500px; /* Match the width of the table */
+    max-width: 1200px; /* Set a maximum width */
+    border-collapse: collapse;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added shadow for a professional look */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #ffffff; /* White background for contrast */
+}
+
+.form-table td {
+    padding: 15px; /* Padding for better spacing */
+}
+
+input[type="text"],
+select {
+    padding: 10px; /* Standard padding for input fields */
+    width: 100%; /* Full width of the parent element */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px; /* Standard font size */
+}
+
+input[type="submit"] {
+    padding: 10px; /* Standard padding for submit button */
+    font-size: 16px; /* Standard font size */
+    background-color: #2c3e50; /* Button color */
+    color: white; /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+input[type="submit"]:hover {
+    background-color: #2980b9; /* Darker shade on hover */
+}
+
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+</head>
+
+<body>
+
+    <header>
+        <div class="three-dots" onclick="toggleSidebar()">&#x22EE;</div>
+        <h1 style="font-size: 18px; color: white;">Student Management System</h1>
+        <div>
+            <img src="D:\@SHIFTA\OIP.jpg" alt="User Logo" style="height: 40px; cursor: pointer;" class="profile-icon">
+            <ul class="logout-dropdown">
+                <li>
+                    <a href="{% url 'password_change' %}">
+                        <i class="fas fa-user-lock" style="margin-right: 5px;"></i> Change Password
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logoutpage' %}">
+                        <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+    
+
+    <div class="sidebar" id="sidebar">
+        <h2>Student Management</h2>
+        <ul>
+            <li>
+                <a href="#courses" class="dropdown-toggle"><i class="fas fa-book icon"></i>Courses</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'cource' %}"><i class="fas fa-plus icon"></i>Add Course</a></li>
+                    <li><a href="{% url 'cource' %}"><i class="fas fa-list icon"></i>Course List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#students" class="dropdown-toggle"><i class="fas fa-user-graduate icon"></i>Students</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'table' %}"><i class="fas fa-plus icon"></i>Add Student</a></li>
+                    <li><a href="{% url 'table' %}"><i class="fas fa-list icon"></i>Student List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#teachers" class="dropdown-toggle"><i class="fas fa-chalkboard-teacher icon"></i>Teachers</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'teacher' %}"><i class="fas fa-plus icon"></i>Add Teacher</a></li>
+                    <li><a href="{% url 'teacher' %}"><i class="fas fa-list icon"></i>Teacher List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#calendar" class="dropdown-toggle"><i class="fas fa-calendar-alt icon"></i>Academic Calendar</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'calender' %}"><i class="fas fa-calendar-check icon"></i>Events</a></li>
+                    <li><a href="{% url 'calender' %}"><i class="fas fa-exclamation-circle icon"></i>Important Dates</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#library" class="dropdown-toggle"><i class="fas fa-book-open icon"></i>Library</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'library' %}"><i class="fas fa-list icon"></i>Catalog</a></li>
+                    <li><a href="{% url 'library' %}"><i class="fas fa-book-reader icon"></i>Borrowed Books</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#results" class="dropdown-toggle"><i class="fas fa-clipboard-list icon"></i>Results</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'result' %}"><i class="fas fa-eye icon"></i>View Results</a></li>
+                    <li><a href="{% url 'result' %}"><i class="fas fa-chart-line icon"></i>Grade Report</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#schedule" class="dropdown-toggle"><i class="fas fa-clock icon"></i>Class Schedule</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'shedeul' %}"><i class="fas fa-table icon"></i>Timetable</a></li>
+                    <li><a href="{% url 'shedeul' %}"><i class="fas fa-calendar-check icon"></i>Exam Schedule</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#batch" class="dropdown-toggle"><i class="fas fa-th icon"></i>Batch</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'batch' %}"><i class="fas fa-plus icon"></i>Add Batch</a></li>
+                    <li><a href="{% url 'batch' %}"><i class="fas fa-list icon"></i>Batch List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#semester" class="dropdown-toggle"><i class="fas fa-calendar icon"></i>Semester</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'semester' %}"><i class="fas fa-plus icon"></i>Add Semester</a></li>
+                    <li><a href="{% url 'semester' %}"><i class="fas fa-list icon"></i>Semester List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#section" class="dropdown-toggle"><i class="fas fa-folder icon"></i>Section</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'section' %}"><i class="fas fa-plus icon"></i>Add Section</a></li>
+                    <li><a href="{% url 'section' %}"><i class="fas fa-list icon"></i>Section List</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#classes" class="dropdown-toggle"><i class="fas fa-chalkboard-teacher icon"></i>Classes</a>
+                <ul class="dropdown">
+                    <li><a href="{% url 'classes' %}"><i class="fas fa-plus icon"></i>Add Class</a></li>
+                    <li><a href="{% url 'classes' %}"><i class="fas fa-list icon"></i>Class List</a></li>
+                </ul>
+            </li>
+            <li><a href="#contact"><i class="fas fa-envelope icon"></i>Contact</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+
+
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search Students..." onkeyup="searchTable()">
+        </div>
+
+        <div style="display: flex; justify-content: center;">
+            {% block body %}
+            {% endblock body %}
+        </div>
+
+        <!-- Add Student Form -->
+<!-- Add Student Form -->
+<!-- Add Student Form -->
+
+
+
+
+        <footer>
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Toggle Sidebar Function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+            const content = document.querySelector('.content');
+            content.style.marginLeft = sidebar.classList.contains('active') ? '250px' : '0';
+        }
+
+        // Dropdown for logout options
+        document.querySelector('.profile-icon').addEventListener('click', () => {
+            const dropdown = document.querySelector('.logout-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close logout dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            const isProfileIcon = event.target.matches('.profile-icon');
+            const isDropdownItem = event.target.closest('.logout-dropdown');
+            if (!isProfileIcon && !isDropdownItem) {
+                document.querySelector('.logout-dropdown').style.display = 'none';
+            }
+        });
+
+        // Search function for filtering students
+        function searchTable() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#studentTable tr');
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                const name = cells[1].textContent.toLowerCase();
+                const course = cells[2].textContent.toLowerCase();
+
+                if (name.includes(filter) || course.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Dummy functions for actions
+        function viewStudent(id) {
+            alert('View student with ID: ' + id);
+        }
+
+        function editStudent(id) {
+            alert('Edit student with ID: ' + id);
+        }
+
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete student with ID: ' + id + '?')) {
+                alert('Student with ID ' + id + ' deleted');
+            }
+        }
+
+        // JavaScript for sidebar dropdown functionality
+        document.querySelectorAll('.dropdown-toggle').forEach(item => {
+            item.addEventListener('click', event => {
+                const dropdown = item.nextElementSibling;
+                const isOpen = dropdown.style.display === 'block';
+
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown').forEach(drop => {
+                    drop.style.display = 'none';
+                });
+
+                // Toggle the clicked dropdown
+                dropdown.style.display = isOpen ? 'none' : 'block';
+            });
+        });
+    </script>
+
+</body>
+
+</html>
